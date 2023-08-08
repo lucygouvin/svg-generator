@@ -4,6 +4,7 @@
 // -set font family
 // -set font size/weight/style
 // Accept rgb values for color
+// custom file name
 
 // TO DO:
 // Error handling

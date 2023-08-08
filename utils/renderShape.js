@@ -10,17 +10,19 @@ function renderShape({shape, shape_color, text, text_color}){
     let logoShape;
     switch (shape){
         case "Square":
-            logoShape = new Square(shape_color, text, text_color);
+            logoShape = new Square();
             break;
         case "Circle":
-            logoShape = new Circle(shape_color, text, text_color);
+            logoShape = new Circle();
             break;
         case "Triangle":
-            logoShape = new Triangle(shape_color, text, text_color);
+            logoShape = new Triangle();
             break;
         default:
             throw new Error ("Shape not defined")
     }
+    logoShape.setColor(shape_color)
+    logoShape.setContent(text, text_color)
     writeFile.writeToFile("./output/logo.svg", logoShape.render())
 }
 
