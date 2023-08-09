@@ -2,7 +2,7 @@ const fs = require("fs/promises");
 
 function writeToFile(fileName, data) {
   fs.writeFile(fileName, data)
-    .then(console.log("Logo created in output folder!"))
+    .then(console.log("Generated logo.svg"))
     .catch((error) => {
       console.log(error);
     });
