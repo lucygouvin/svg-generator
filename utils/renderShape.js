@@ -1,11 +1,9 @@
 // import the shape classes to get access to their render methods
-// const Shapes = require("../lib/shapes")
 const Square = require("../lib/square")
 const Circle = require("../lib/circle")
 const Triangle = require("../lib/triangle")
 const writeFile = require("./writeFile")
 
-// Shape, shape color, text, text color
 function renderShape({shape, shape_color, text, text_color}){
     let logoShape;
     switch (shape){
@@ -23,7 +21,7 @@ function renderShape({shape, shape_color, text, text_color}){
     }
     logoShape.setColor(shape_color)
     logoShape.setContent(text, text_color)
-    writeFile.writeToFile("./output/logo.svg", logoShape.render())
+    writeFile.writeToFile("./output/logo.svg", `${logoShape.renderSVG()} ${logoShape.render()} ${logoShape.renderContent()} </svg> `)
 }
 
 module.exports = {
