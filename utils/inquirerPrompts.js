@@ -1,6 +1,7 @@
 const inquirer = require("inquirer");
 const renderShape = require("./renderShape")
 
+// Array of questions for Inquirer
 const questions = [
   {
     type: "list",
@@ -12,7 +13,6 @@ const questions = [
     type: "input",
     message: "Enter shape color: ",
     name: "shape_color",
-    default: "black",
     validate: validateColor,
     filter: filterColor,
   },
@@ -26,79 +26,79 @@ const questions = [
     type: "input",
     message: "Enter text color: ",
     name: "text_color",
-    default:"white",
     validate: validateColor,
     filter: filterColor
   },
 ];
 
+// Prompt user to answer the questions above
 function askQuestions() {
   inquirer
   .prompt(questions)
-  .then((response) => {
-   console.log(response)
-    renderShape.renderShape(response)
-  } )
+  // After the questions have been answered, pass the response to the renderShape function
+  .then((response) => renderShape.renderShape(response))
   .catch((error) => console.log(error));
 }
-function filterColor(input) {
-  return new Promise((resolve, reject) => {
-    if (input.includes("#") || /\d/.test(input)) {
-      if (input[0] != "#") {
-        input = "#" + input;
-      }
-    } else {
-      input = input.replace(/ /g, "");
-    }
-    resolve(input)
-  });
-}
+
+
+// HELPER FUNCTIONS
+// Validation Functions
+
+// Check to see if the user has entered a valid color response
 function validateColor(input){
   return new Promise((resolve, reject) => {
-    // If the user input something, we can test to see if it's a valid hex code
+    // Check if the user input anything
     if (input) {
       // Check to see if it has a # or numbers, indicating it could be a hexcode
       if (input.includes("#") || /\d/.test(input)) {
-        if (validateHexColor(input)) {
-          resolve(true);
-        } else {
-          reject(false);
-        }
-      } else {
+        // If it may be a hexcode, we can check to see if it is a valid hexcode
+        validateHexColor(input) ? resolve(true) : reject (false);
+      } 
+      // If the input is not empty, but it doesn't contain numbers or #, it may be a color keyword. I couldn't think of an elegant way to validate the strings, unfortunately.
+      else {
         resolve(true);
       }
     }
-    // If the color is empty, reject it
+    // If the user did not supply an answer, reject
     else {
       reject(false);
     }
   });
 }
 
+// Check to see if a potential hexcode is valid using regex
+function validateHexColor(hexInput){
+  // remove the # if there is one by slicing the last 6 characters of the string
+  const hex = hexInput.slice(-6);
+  // Regex says that the string must only consist of 6 characters that are either 0-9 or A-F (uppercase or lowercase)
+  return (hex.match(/[0-9A-Fa-f]{6}/g))
+}
+
+// Check to see if the text is fewer than 3 characters long, and does not include emojis
 function validateText(input){
-  const noEmojiRegex = /\p{Emoji}/u;
 return new Promise ((resolve,reject) => {
-    if (input.length >3){
-      reject (false)
-    }else if ( noEmojiRegex.test(input)) {
-      reject(false)
-    }else{
-      resolve(true)
-    }
+  // If the input is longer than 3 characters, immediately reject. If not, check to see if it contains emojis. If yes, reject. If no, resolve.
+  input.length > 3 ? reject (false) : (/\p{Emoji}/u.test(input) ? reject(false):resolve(true))
   })
 }
 
-function validateHexColor(hexInput){
-  // remove the # if there is one
-  const hex = hexInput.slice(-6);
-  const hexRegEx = /[0-9A-Fa-f]{6}/g;
-  return (hex.match(hexRegEx))
+// Filter Function
+
+// Normalize the color data to maximize chance of it being a valid string for the fill property
+function filterColor(input) {
+  // This promise will never reject because the data has previously been validated
+  return new Promise((resolve, reject) => {
+    // If the input appears to be a hex, make sure the first character is #. If it's not, add it.
+    if (input.includes("#") || /\d/.test(input)) {
+      if (input[0] != "#") {
+        input = "#" + input;
+      }
+    // If it's not a hex, it must be a string. Remove spaces as color keywords must be one word. Capitalization does not matter for the fill property.
+    } else {
+      input = input.replace(/ /g, "");
+    }
+    resolve(input)
+  });
 }
 
-module.exports = { askQuestions, validateHexColor, validateText, validateColor };
-
-function init() {
-console.log(validateText("abcde"))
-}
-
-init()
+module.exports = { askQuestions };
